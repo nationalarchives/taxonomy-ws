@@ -2,12 +2,11 @@ package uk.gov.nationalarchives.discovery.taxonomy.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.nationalarchives.discovery.taxonomy.domain.controller.Query;
 import uk.gov.nationalarchives.discovery.taxonomy.domain.controller.SearchResults;
+import uk.gov.nationalarchives.discovery.taxonomy.service.TaxonomyService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +16,16 @@ import java.util.List;
  */
 
 @RestController
-public class SearchController {
+public class TaxonomyController {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final TaxonomyService taxonomyService;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    public TaxonomyController(TaxonomyService taxonomyService) {
+        this.taxonomyService = taxonomyService;
+    }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     public SearchResults search(@RequestBody Query query) {
@@ -32,6 +38,12 @@ public class SearchController {
         searchResults.setDocumentIds(documentIds);
         return searchResults;
 
+    }
 
+    @RequestMapping(value = "/publishCategory", method = RequestMethod.GET)
+    public void publishOneCategory(@RequestParam String categoryId) {
+        logger.info("publishing category: {}", categoryId);
+        taxonomyService.publishOneCategory(categoryId);
     }
 }
+
